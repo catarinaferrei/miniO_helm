@@ -7,6 +7,40 @@ The PVC makes a request to the storage class.
 
 The service type is loadbalancer. Some issues were faced when accessing to the service in the minikube and it was required to use kubectl port-forward. 
 
+To run miniO in minikube make sure it is isntalled and run the following commands:
+P.S: You need to have minikube running, for that just type in the terminal minikube start
+```
+helm create NAME
+
+```
+It will generate a helm chart for you and you can replace the helm templates with these ones.
+After doing that, it's time to install helm in the minikube.
+
+```
+helm  install name ./root where helm chart is located
+
+```
+To install helm you need to be a root above of the helm chart
+
+A more concrete example is the following:
+
+```
+helm  install minio ./minio
+
+```
+Where minio is the name of the helm chart we defined when created helm and ./minio is the folder that resides helm chart.
+
+After having your pod running, go to pod/logs and you will see two urls with two different ports(the port from the container and another port set up by the cluster).
+In case you having issues open the url you can request the following command to open the service for you.
+
+
+```
+
+kubectl port-forward <pod-name> 90000:32983
+
+```
+where 9000 is the container and target port and 32983 is a port artibutarly given by the cluster that you can access in the pod/logs.
+
 ## Deployment
 
 ![](deployment.PNG)
