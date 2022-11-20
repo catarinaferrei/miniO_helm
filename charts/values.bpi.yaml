@@ -2,7 +2,7 @@ global:
   version: "65b12cf9"
   buildDate: "2022/11/20/ 21:32:49"
   templateVersion: "0.1.1"
-  #namespace: dev-helm
+  namespace: default
     
 
 minio:
