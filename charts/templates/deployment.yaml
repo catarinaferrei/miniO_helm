@@ -1,22 +1,27 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
- name: "{{ .Values.name }}"
+ name: "{{ .Values.minio.name }}"
+ namespace: "{{ .Values.global.namespace }}"
  labels:
-    app: "{{ .Values.name }}"
+    app: "{{ .Values.minio.name }}"
+    version: "{{ .Values.global.version }}"
+ annotations: 
+    build-date: "{{ .Values.global.buildDate }}"
+    template-version: "{{ .Values.global.templateVersion }}"
 spec:
  strategy:
    type: Recreate
  selector:
    matchLabels:
-     app: "{{ .Values.name }}"
+     app: "{{ .Values.minio.name }}"
  template:
    metadata:
      labels:
-       app: "{{ .Values.name }}"
+       app: "{{ .Values.minio.name }}"
    spec:
      containers:
-       - name: "{{ .Values.name }}"
+       - name: "{{ .Values.minio.name }}"
          image: "{{ .Values.minio.image }}"         
          args:
          - server
