@@ -1,15 +1,16 @@
-name: minio
-  
-minio:
-  image: minio/minio
-  repository:
-  tag: RELEASE.2021-02-14T04-01-33Z
-  pullPolicy: IfNotPresent
+global:
+  version: "65b12cf9"
+  buildDate: "2022/11/20/ 21:32:49"
+  templateVersion: "0.1.1"
+  namespace: dev-helm
+    
 
-mcImage:
-  repository: minio/mc
-  tag: RELEASE.2021-02-14T04-28-06Z
-  pullPolicy: IfNotPresent
+minio:
+  image: "de.icr.io/bpi-helm/bpi-minio:65b12cf9"
+  name: minio
+
+
+
 
 ## Internal port number for MinIO S3 API container
 ## Change service.port to change external port number
@@ -80,7 +81,7 @@ persistence:
   ##
   ## Storage class of PV to bind. By default it looks for standard storage class.
   ## If the PV uses a different storage class, specify that here.
-  storageClass: standard
+  storageClass: ibmc-vpc-block-10iops-tie
   accessMode: ReadWriteOnce
   size: 20Gi
 
@@ -118,3 +119,5 @@ makeBucketJob:
   resources:
     requests:
       memory: 128Mi
+
+
