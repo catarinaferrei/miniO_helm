@@ -1,27 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
- name: "{{ .Values.minio.name }}"
- namespace: "{{ .Values.global.namespace }}"
+ name: "{{ .Values.name }}"
  labels:
-    app: "{{ .Values.minio.name }}"
-    version: "{{ .Values.global.version }}"
- annotations: 
-    build-date: "{{ .Values.global.buildDate }}"
-    template-version: "{{ .Values.global.templateVersion }}"
+    app: "{{ .Values.name }}"
 spec:
  strategy:
    type: Recreate
  selector:
    matchLabels:
-     app: "{{ .Values.minio.name }}"
+     app: "{{ .Values.name }}"
  template:
    metadata:
      labels:
-       app: "{{ .Values.minio.name }}"
+       app: "{{ .Values.name }}"
    spec:
      containers:
-       - name: "{{ .Values.minio.name }}"
+       - name: "{{ .Values.name }}"
          image: "{{ .Values.minio.image }}"         
          args:
          - server
@@ -46,4 +41,4 @@ spec:
      volumes:
        - name: "{{ .Values.volumes.name }}"
          persistentVolumeClaim:
-           claimName: minio-pv-claim
+           claimName: "{{ .Values.persistentVolumeClaim.claimName }}"
