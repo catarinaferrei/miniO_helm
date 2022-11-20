@@ -1,4 +1,4 @@
-name: minio
+ame: minio
   
 minio:
   image: minio/minio
@@ -118,4 +118,3 @@ makeBucketJob:
   resources:
     requests:
       memory: 128Mi
-
