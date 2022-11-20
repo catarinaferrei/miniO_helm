@@ -6,7 +6,7 @@ global:
     
 
 minio:
-  image: "de.icr.io/bpi-helm/bpi-minio:65b12cf9"
+  image: minio/minio
   name: minio
 
 
