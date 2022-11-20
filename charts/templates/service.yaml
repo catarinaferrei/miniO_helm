@@ -1,18 +1,17 @@
 apiVersion: v1
 kind: Service
-metadata:
-  name:  "{{ .Values.minio.name}}--service"
-  namespace: "{{ .Values.global.namespace }}"
-  labels:
-    app: "{{ .Values.minio.name}}"
-    version: "{{ .Values.global.version}}"
-  annotations: 
-    build-date: "{{ .Values.global.buildDate }}"
-    template-version: "{{ .Values.global.templateVersion }}"
-spec:
-  selector:
-    app: "{{ .Values.minio.name}}"
-  ports:
-    - port: 9000
+metadata: 
+  labels: 
+    app: "{{ .Values.name}}"
+  name: "{{ .Values.name}}--service"
+spec: 
+  ports: 
+    - 
+      name: http
+      port: 9000
+      protocol: TCP
       targetPort: 9000
+  selector: 
+    app: "{{ .Values.name}}"
   type: "{{ .Values.service.type}}"
+
