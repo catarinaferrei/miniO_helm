@@ -1,4 +1,4 @@
-ame: minio
+name: minio
   
 minio:
   image: minio/minio
