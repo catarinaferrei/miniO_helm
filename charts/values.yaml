@@ -1,1 +1,121 @@
+name: minio
+  
+minio:
+  image: minio/minio
+  repository:
+  tag: RELEASE.2021-02-14T04-01-33Z
+  pullPolicy: IfNotPresent
+
+mcImage:
+  repository: minio/mc
+  tag: RELEASE.2021-02-14T04-28-06Z
+  pullPolicy: IfNotPresent
+
+## Internal port number for MinIO S3 API container
+## Change service.port to change external port number
+minioAPIPort: "9000"
+
+## Internal port number for MinIO Browser Console container
+## Change consoleService.port to change external port number
+minioConsolePort: "9001"
+certsPath:  "/etc/minio/certs/"
+extraArgs: []
+bucketRoot: ""
+
+## minio server mode, i.e. standalone or distributed.
+## Distributed Minio ref: https://docs.minio.io/docs/distributed-minio-quickstart-guide
+##
+mode: standalone
+
+## TLS Settings for Minio
+tls:
+  enabled: false
+  ## Create a secret with private.key and public.crt files and pass that here. Ref: https://github.com/minio/minio/tree/master/docs/tls/kubernetes#2-create-kubernetes-secret
+  certSecret: ""
+  publicCrt: public.crt
+  privateKey: private.key
+
+service:
+  type: LoadBalancer
+  port: 9000
+  nodePort: 32000
+
+
+env:
+  accessKey: "minioUser"
+  secretKey: "minio123"
+
+volumes: 
+  name: "export"
+
+
+persistentVolumeClaim:
+  claimName: minio-pv-claim
+
+mountPath: /data
+
+## Update strategy for Deployments
+deploymentUpdate:
+  type: RollingUpdate
+  maxUnavailable: 0
+  maxSurge: 100%
+
+
+
+persistence:
+  enabled: true
+  annotations: {}
+
+  ## A manually managed Persistent Volume and Claim
+  ## Requires persistence.enabled: true
+  ## If defined, PVC must be created manually before volume will be bound
+  existingClaim: ""
+
+  ## minio data Persistent Volume Storage Class
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is
+  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+  ##   GKE, AWS & OpenStack)
+  ##
+  ## Storage class of PV to bind. By default it looks for standard storage class.
+  ## If the PV uses a different storage class, specify that here.
+  storageClass: standard
+  accessMode: ReadWriteOnce
+  size: 20Gi
+
+  defaultBucket:
+    enabled: false
+    ## If enabled, must be a string with length > 0
+    name: bucket
+    ## Can be one of none|download|upload|public
+    policy: none
+    ## Purge if bucket exists already
+    purge: false
+    ## set versioning for bucket true|false
+    # versioning: false
+
+## Create multiple buckets after minio install
+## Enabling `defaultBucket` will take priority over this list
+##
+buckets: []
+  # - name: bucket1
+  #   policy: none
+  #   purge: false
+  # - name: bucket2
+  #   policy: none
+  #   purge: false
+
+## Additional Annotations for the Kubernetes Batch (make-bucket-job)
+makeBucketJob:
+  podAnnotations:
+  annotations:
+  securityContext:
+    enabled: false
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+  resources:
+    requests:
+      memory: 128Mi
 
