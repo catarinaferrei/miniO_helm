@@ -46,4 +46,4 @@ spec:
      volumes:
        - name: "{{ .Values.volumes.name }}"
          persistentVolumeClaim:
-           claimName: "{{ .Values.persistentVolumeClaim.claimName }}"
+           claimName: minio-pv-claim
