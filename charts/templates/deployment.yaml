@@ -31,9 +31,9 @@ spec:
              memory: 1Gi
          ports:
             - name: {{$scheme}}
-              containerPort: "{{.Values.minioAPIPort}}"
-            - name: {{$scheme}}
-              containerPort: "{{.Values.minioConsolePort}}"
+              containerPort: 9000
+            #- name: {{$scheme}}
+              containerPort: 9001
          env:
           - name: "MINIO_ROOT_USER"
             value: "{{ .Values.env.accessKey }}" 
