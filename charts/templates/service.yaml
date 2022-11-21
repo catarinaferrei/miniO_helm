@@ -16,7 +16,6 @@ spec:
 {{- range $i , $ip := .Values.service.externalIPs }}
   - {{ $ip }}
 {{- end }}
-{{- end }}
   selector:
     app: "{{ .Values.name}}"
 
