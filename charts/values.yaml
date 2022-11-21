@@ -37,8 +37,14 @@ tls:
 
 service:
   type: LoadBalancer
-  port: 9000
+  port: "9000"
   nodePort: 32000
+
+consoleService:
+  type: LoadBalancer
+  clusterIP: ~
+  port: "9001"
+  nodePort: 32001
 
 
 env:
