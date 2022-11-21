@@ -1,48 +1,23 @@
 {{ $scheme := "http" }}
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: Service
 metadata:
- name: "{{ .Values.name }}"
- labels:
-    app: "{{ .Values.name }}"
+  name: "{{ .Values.name}}-console"
+  labels:
+    app: "{{ .Values.name}"
 spec:
- strategy:
-   type: Recreate
- selector:
-   matchLabels:
-     app: "{{ .Values.name }}"
- template:
-   metadata:
-     labels:
-       app: "{{ .Values.name }}"
-   spec:
-     containers:
-       - name: "{{ .Values.name }}"
-         image: "{{ .Values.minio.image }}"         
-         args:
-         - server
-         - /data
-         resources:
-           requests:
-             cpu: "250m"
-             memory: 500Mi
-           limits:
-             cpu: "500m"
-             memory: 1Gi
-         ports:
-            - name: {{$scheme}}
-              containerPort: "{{.Values.minioAPIPort}}"
-            - name: {{$scheme}}
-              containerPort: "{{.Values.minioConsolePort}}"
-         env:
-          - name: "MINIO_ROOT_USER"
-            value: "{{ .Values.env.accessKey }}" 
-          - name: "MINIO_ROOT_PASSWORD"
-            value: "{{ .Values.env.secretKey }}"
-         volumeMounts:
-           - mountPath: "{{ .Values.mountPath }}"
-             name: "{{ .Values.volumes.name }}"
-     volumes:
-       - name: "{{ .Values.volumes.name }}"
-         persistentVolumeClaim:
-           claimName: "{{ .Values.persistentVolumeClaim.claimName }}"
+  type: {{ .Values.consoleService.type }}
+  loadBalancerIP: {{ default "" .Values.consoleService.loadBalancerIP }}
+  ports:
+    - name: {{ $scheme }}
+      port: {{ .Values.consoleService.port }}
+      targetPort: {{ .Values.minioConsolePort }}
+      protocol: TCP
+{{- if .Values.consoleService.externalIPs }}
+  externalIPs:
+{{- range $i , $ip := .Values.consoleService.externalIPs }}
+  - {{ $ip }}
+{{- end }}
+{{- end }}
+  selector:
+    app: "{{ .Values.name}"
