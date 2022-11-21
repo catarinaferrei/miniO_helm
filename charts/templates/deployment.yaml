@@ -1,3 +1,8 @@
+{{- if eq .Values.mode "standalone" }}
+{{ $scheme := "http" }}
+{{- if .Values.tls.enabled }}
+{{ $scheme = "https" }}
+{{ end }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -29,7 +34,10 @@ spec:
              cpu: "500m"
              memory: 1Gi
          ports:
-          - containerPort: 9000
+            - name: {{$scheme}}
+              containerPort: "{{.Values.minioAPIPort}}"
+            - name: {{$scheme}}
+              containerPort: "{{.Values.minioConsolePort}}"
          env:
           - name: "MINIO_ROOT_USER"
             value: "{{ .Values.env.accessKey }}" 
