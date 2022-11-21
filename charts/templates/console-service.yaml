@@ -1,39 +1,48 @@
 {{ $scheme := "http" }}
-{{- if .Values.tls.enabled }}
-{{ $scheme = "https" }}
-{{ end }}
-apiVersion: v1
-kind: Service
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: "{{ .Values.name}}--console"
-  labels:
-    app: "{{ .Values.name}}"
+ name: "{{ .Values.name }}"
+ labels:
+    app: "{{ .Values.name }}"
 spec:
-{{- if (or (eq .Values.consoleService.type "ClusterIP" "") (empty .Values.consoleService.type)) }}
-  type: ClusterIP
-  {{- if not (empty .Values.consoleService.clusterIP) }}
-  clusterIP: {{ .Values.consoleService.clusterIP }}
-  {{end}}
-{{- else if eq .Values.consoleService.type "LoadBalancer" }}
-  type: {{ .Values.consoleService.type }}
-  loadBalancerIP: {{ default "" .Values.consoleService.loadBalancerIP }}
-{{- else }}
-  type: {{ .Values.consoleService.type }}
-{{- end }}
-  ports:
-    - name: {{ $scheme }}
-      port: {{ .Values.consoleService.port }}
-      protocol: TCP
-{{- if (and (eq .Values.consoleService.type "NodePort") ( .Values.consoleService.nodePort)) }}
-      nodePort: {{ .Values.consoleService.nodePort }}
-{{- else }}
-      targetPort: {{ .Values.minioConsolePort }}
-{{- end}}
-{{- if .Values.consoleService.externalIPs }}
-  externalIPs:
-{{- range $i , $ip := .Values.consoleService.externalIPs }}
-  - {{ $ip }}
-{{- end }}
-{{- end }}
-  selector:
-    app: "{{ .Values.name}}"
+ strategy:
+   type: Recreate
+ selector:
+   matchLabels:
+     app: "{{ .Values.name }}"
+ template:
+   metadata:
+     labels:
+       app: "{{ .Values.name }}"
+   spec:
+     containers:
+       - name: "{{ .Values.name }}"
+         image: "{{ .Values.minio.image }}"         
+         args:
+         - server
+         - /data
+         resources:
+           requests:
+             cpu: "250m"
+             memory: 500Mi
+           limits:
+             cpu: "500m"
+             memory: 1Gi
+         ports:
+            - name: {{$scheme}}
+              containerPort: "{{.Values.minioAPIPort}}"
+            - name: {{$scheme}}
+              containerPort: "{{.Values.minioConsolePort}}"
+         env:
+          - name: "MINIO_ROOT_USER"
+            value: "{{ .Values.env.accessKey }}" 
+          - name: "MINIO_ROOT_PASSWORD"
+            value: "{{ .Values.env.secretKey }}"
+         volumeMounts:
+           - mountPath: "{{ .Values.mountPath }}"
+             name: "{{ .Values.volumes.name }}"
+     volumes:
+       - name: "{{ .Values.volumes.name }}"
+         persistentVolumeClaim:
+           claimName: "{{ .Values.persistentVolumeClaim.claimName }}"
