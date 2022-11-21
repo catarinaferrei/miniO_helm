@@ -1,4 +1,5 @@
 {{ $scheme := "http" }}
+{{ $bucketRoot := or ($.Values.bucketRoot) ($.Values.mountPath) }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -18,9 +19,14 @@ spec:
    spec:
      containers:
        - name: "{{ .Values.name }}"
-         image: "{{ .Values.minio.image }}"         
+         image: "{{ .Values.minio.image }}"
+         command:
+            - "/bin/sh"
+            - "-ce"
+            - "/usr/bin/docker-entrypoint.sh minio server {{ $bucketRoot }} -S {{ .Values.certsPath }} --address :{{ .Values.minioAPIPort }} --console-address :{{ .Values.minioConsolePort}}"
+      
          args:
-         - server
+         - server 
          - /data
          resources:
            requests:
