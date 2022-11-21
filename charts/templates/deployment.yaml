@@ -1,8 +1,4 @@
-{{- if eq .Values.mode "standalone" }}
-{{ $scheme := "http" }}
-{{- if .Values.tls.enabled }}
-{{ $scheme = "https" }}
-{{ end }}
++{{ $scheme := "http" }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
