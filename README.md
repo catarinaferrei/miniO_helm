@@ -64,3 +64,21 @@ The service type is a LoadBalancer. Service works as an abstraction of the Pods 
 The target Port must correspond to the container Port because that's the port that the pod is listening to and the port that the service receives requests and sends it to the pod. To match a service with a pod the selector must be same as the pod's name.
 
 The Port and TargetPort can be the same port or of different ports, only the Targetport and container port must match. The difference between the port and the targetPort is that the Port is the Port that the service listens to (service is open at a specific port) and the forwards the requests to TargerPort. Then the TargetPort is responsible to forward these requests to the container.
+
+
+To install the minioAPI and the miniOConsolePort two services had to be deployed. One service --MinioConsole-- is responsible to run the UI of minio and the miniOAPI is responsible to connect the client to the server.
+
+
+## Minio Client
+
+In the folder test_client there is a python file that emulates a client where it creates a bucket and sends it to the server. 
+
+```
+
+python3 test_client.py
+
+```
+
+The client is a single constructor that takes three required parameters to set up the connection between the client and the server. The first is the endpoint which should be minioAPI url, the access key and the secret key.
+
+
