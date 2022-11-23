@@ -19,6 +19,7 @@ minioAPIPort: "9000"
 ## Change consoleService.port to change external port number
 minioConsolePort: "9001"
 certsPath:  "/etc/minio/certs/"
+#"/root/.minio/certs"
 extraArgs: []
 bucketRoot: ""
 
