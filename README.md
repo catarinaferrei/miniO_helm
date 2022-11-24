@@ -1,5 +1,5 @@
 # miniO_helm
-A description of how to deploy miniO in the cloud
+A description of how to deploy miniO in the cloud with a secure connection provided by the TLS security protocol.
 
 
 To deploy the miniO it was needed to create a helm chart and a template folder containing three manifestos: pvc, service and deployment.
