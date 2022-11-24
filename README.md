@@ -69,7 +69,69 @@ The Port and TargetPort can be the same port or of different ports, only the Tar
 To install the minioAPI and the miniOConsolePort two services had to be deployed. One service --MinioConsole-- is responsible to run the UI of minio and the miniOAPI is responsible to connect the client to the server.
 
 
-## Minio Client
+# 2 - Setup Kubernetes Security
+
+> # 2.1 Secrets
+
+First step is to create a secrets yaml that will contain the values encoded for the self-signed certificate. (We will be using helm chart so the encoded values should be saved in the values.yaml and accessed in the secrets.yaml.) 
+
+
+```
+kubectl create secret generic tls-ssl-minio --from-file=path/to/private.key --from-file=path/to/public.crt
+
+```
+Cross check if the secret is created successfully using
+
+```
+kubectl get secrets
+
+```
+  
+If you want to export this yaml, run the following command:
+  
+    
+```
+kubectl get secret <secretname> -o yaml
+
+```
+  
+> # 2.2 Deployment 
+  
+Since the secrets will be consumed by the deployment as a file stored in the filesytem we need to set up a volumemounts in the container and a volume in the deployment. 
+  
+To illustrate this we will be using miniO as an example on how to setup secrets as a volume in the container, but also further detail how to put it properly working on minio. There are few details that should then be confirmed with the app you are deploying and you should refer to the app's documentation on how to sort it out. 
+  
+```
+volumeMounts:
+           - name:  secret-volume
+             mountPath: "{{ .Values.certsPath }}"  #saves cert
+             readOnly: true
+
+```
+  
+ where "{{ .Values.certsPath }}" is the path you want to store the files of the secrets. 
+  
+By default miniO reccomends to be in a standard Kubernetes configuration, this will be /root/.minio/certs. That is, must be set to the path of the MinIO server's config sub-directory that is used to store certificates.
+  
+  The volumeMounts name should match the volumes.name so that the volume.mounts knows which volume should connect to.
+  
+  Volume is a diretory that has a longer lifecyle than the container. if the container dies the data is stored in the volume. In the volumemounts.path you declare the path where you want to save your data in the volumes. In this case, we set the secrets as a volume where the files of secrets reside on a directory and the volume.mountspath saves those files in a folder inside the volumes.
+  ```
+  volumes:
+      - name: secret-volume
+        secret:
+          secretName: tls-ssl-minio
+          items:
+          - key: public.crt
+            path: public.crt
+          - key: private.key
+            path: private.key
+          - key: public.crt
+            path: CAs/public.crt
+  ```
+  
+
+# 3 - Minio Client
 
 In the folder test_client there is a python file that emulates a client where it creates a bucket and sends it to the server. 
 
