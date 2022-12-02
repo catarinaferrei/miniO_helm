@@ -1,3 +1,18 @@
+https://www.flagship.io/git-branching-strategies/
+
+Aparentemente o que usamos no banco com o RTC chama-se (curiosamente): GitLab Flow
+
+Alguns vídeos do Pai do CI/CD (Dave Farley), que advoga o base trunk base development…
+
+Git Flow Is A Bad Idea
+https://www.youtube.com/watch?v=_w6TwnLCFwA
+Continuous Integration vs Feature Branch Workflow
+https://www.youtube.com/watch?v=v4Ijkq6Myfc
+Why CI is BETTER Than Feature Branching
+https://www.youtube.com/watch?v=lXQEi1O5IOI
+
+
+
 # miniO_helm
 A description of how to deploy miniO in the cloud with a secure connection provided by the TLS security protocol.
 
