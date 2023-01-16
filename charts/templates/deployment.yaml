@@ -1,65 +1,57 @@
-{{ $scheme := "https" }}
-{{ $bucketRoot := or ($.Values.bucketRoot) ($.Values.mountPath) }}
-apiVersion: apps/v1
 kind: Deployment
+apiVersion: apps/v1
 metadata:
- name: "{{ .Values.name }}"
- labels:
-    app: "{{ .Values.name }}"
+  name: {{ .Values.global.name }}-v{{ .Values.global.version.major }}
+  namespace: "{{ .Release.Namespace }}"
+  labels:
+    app: {{ .Values.global.name }}-v{{ .Values.global.version.major }}
+    version: "{{ .Values.global.version.major }}.{{ .Values.global.version.minor }}"
+  annotations: 
+    build-date: "{{ .Values.global.buildDate }}"
 spec:
- strategy:
-   type: Recreate
- selector:
-   matchLabels:
-     app: "{{ .Values.name }}"
- template:
-   metadata:
-     labels:
-       app: "{{ .Values.name }}"
-   spec:
-     containers:
-       - name: "{{ .Values.name }}"
-         image: "{{ .Values.minio.image }}"
-         command:
-            - "/bin/sh"
+  selector:
+    matchLabels:
+      app: {{ .Values.global.name }}-v{{ .Values.global.version.major }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.global.name }}-v{{ .Values.global.version.major }}
+    spec:
+      serviceAccountName: {{ .Values.global.name }}-v{{ .Values.global.version.major }}
+      containers:
+        - name: {{ .Values.global.name }}-v{{ .Values.global.version.major }}
+          image: "{{ .Values.global.image }}"
+          command:
+            - "/bin/sh"       
             - "-ce"
-            - "/usr/bin/docker-entrypoint.sh minio server {{ $bucketRoot }} -S {{ .Values.certsPath }} --address :{{ .Values.minioAPIPort }} --console-address :{{ .Values.minioConsolePort}}"
-         args:
-         - server 
-         - /data
-         resources:
-           requests:
-             cpu: "250m"
-             memory: 500Mi
-           limits:
-             cpu: "500m"
-             memory: 1Gi
-         ports:
-          - name: {{$scheme}}
-            containerPort:  {{ .Values.minioConsolePort}}
-            containerPort: {{ .Values.minioAPIPort }}
-         env:
-          - name: "MINIO_ROOT_USER"
-            value: "{{ .Values.env.accessKey }}" 
-          - name: "MINIO_ROOT_PASSWORD"
-            value: "{{ .Values.env.secretKey }}"
-         volumeMounts:
-           - name:  secret-volume
-             mountPath: "{{ .Values.certsPath }}"  #saves cert
-             readOnly: true
-           - name: "{{ .Values.volumes.name }}"
-             mountPath: "{{ .Values.mountPath }}"    
-     volumes:
-       - name:  secret-volume
-         secret:
-          secretName:  "{{.Values.tls.name}}" 
-          items:
-          - key: tls.crt 
-            path: tls.crt
-          - key: tls.key
-            path: tls.key
-          - key: tls.crt 
-            path: CAs/tls.crt 
-       - name: "{{ .Values.volumes.name }}"
-         persistentVolumeClaim:
-           claimName: "{{ .Values.persistentVolumeClaim.claimName }}"
+            - "/usr/bin/docker-entrypoint.sh minio server /data --address :9000 --console-address :9001"   
+          args:
+            - server
+            - /data
+          resources:
+            requests:
+              cpu: "250m"
+              memory: 1Gi
+            limits:
+              cpu: "500m"
+              memory: 2Gi
+          ports:
+            - name: http
+              containerPort:  9000
+              protocol: TCP
+            - name: http-console
+              containerPort:  9001
+              protocol: TCP
+          env:
+            - name: "MINIO_ROOT_USER"
+              value: "{{ .Values.env.accessKey }}" 
+            - name: "MINIO_ROOT_PASSWORD"
+              value: "{{ .Values.env.secretKey }}"
+          volumeMounts:
+            - mountPath: "{{ .Values.mountPath }}"
+              name: "{{ .Values.volumes.name }}"
+      volumes:
+        - name: "{{ .Values.volumes.name }}"
+          persistentVolumeClaim:
+            claimName: "{{ .Values.persistentVolumeClaim.claimName }}"
+
